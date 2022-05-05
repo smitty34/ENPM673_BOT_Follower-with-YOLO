@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+  <include file="$(find darknet_ros)/launch/darknet_ros.launch">
+    <arg name="image"    value="/camera/rgb/image_raw"/>
+  </include>
+
+  <node name="my_detector" pkg="my_detector" type="Marker_Search.py" output="screen"/>
+
+
+</launch>
+
+
+<launch>
+  <!--Argument initialization-->
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="multi_robot_name" default=""/>
+  <arg name="x_pos" default="-0.2"/>
+  <arg name="y_pos" default="1.6"/>
+  <arg name="z_pos" default="0"/>  
+  <arg name="yaw_pos" default="3.14"/>
+
+  <!--Gazebo environment-->
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot3_auefinals)/worlds/turtlebot3_final.world" />
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>  
+
+
+
+</launch>
