@@ -1,77 +1,12 @@
 #!/usr/bin/env python
 
-
-
-
-# robot_x = 0
-# robot_y = 0
-# person_x = 0
-# person_y = 0
-
-
-# class AprilTAG_MODULE:
-#     Tagdata = {"DX":0.0, "DY":0.0, "DZ":0.0, "AX":0.0, "AY":0.0, "AZ":0.0, "AW":0.0}
-    
-#     def __init__(self):
-#         self.Tagdata = {"DX":0.0, "DY":0.0, "DZ":0.0, "AX":0.0, "AY":0.0, "AZ":0.0, "AW":0.0}
-#         self.id = 0
-#         self.roll, self.pitch, self.yaw = 0,0,0
-        
-#     def set_TagData(self, data):
-#         for i in data.markers:
-#             self.id = i.id
-#             self.Tagdata["DX"] = i.pose.pose.position.x
-#             self.Tagdata["DY"] = i.pose.pose.position.y
-#             self.Tagdata["DZ"] = i.pose.pose.position.z
-
-#             self.Tagdata["AX"] = i.pose.pose.orientation.x
-#             self.Tagdata["AY"] = i.pose.pose.orientation.y
-#             self.Tagdata["AZ"] = i.pose.pose.orientation.z
-#             self.Tagdata["AW"] = i.pose.pose.orientation.w
-
-
-
-#             self.roll, self.pitch, self.yaw = euler_from_quaternion([self.Tagdata["AX"], self.Tagdata["AY"], self.Tagdata["AZ"], self.TagData["AW"]])
-
-
-#     def get_yaw(self):
-#         return self.yaw
-
-#     def get_pitch(self):
-#         return self.pitch
-
-#     def get_arctan(self):
-#         return math.degrees(np.arctan(self.Tagdata["DX"]/ self.Tagdata["DZ"]))
-
-#     def get_id(self):
-#         return self.id
-
-#     def get_TagData(self):
-#         return self.Tagdata
-
-#     def get_distance(self):
-#         return math.sqrt(pow(self.Tagdata["DX"], 2) + pow(self.Tagdata["DX"], 2))
-
-#     def Tag_Found(self):
-#         if self.get_id() == 0 and 0 < self.get_distance() < 0.65:
-#             return True
-
-#         return False
-
-#     def finish_T_parking(self):
-#         if self.get_distance() >= 0.76 and self.get_distance() <= 0.85 and abs(self.get_arctan()) < 10:
-#             return True
-
-#         return False
-
-
-
-
 import rospy
 from geometry_msgs.msg import Twist
 import darknet_ros_msgs
 from darknet_ros_msgs.msg import BoundingBoxes, BoundingBox, ObjectCount
 from sensor_msgs.msg import Image
+from apriltag_ros.msg import AprilTagDetectionArray
+from apriltag_ros import drawDetections
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
@@ -104,6 +39,7 @@ class Following:
         self.ymax = 480
         self.sampling_depth = None
         self.control_pub = rospy.Publisher('cmd_vel_mux/input/teleop', Twist, queue_size = 0)
+        self.april_center = rospy.Publisher('tag_center', AprilTagDetectionArray, queue_size = 0)
         self.bridge = CvBridge()
         self.depth_msg = None
         
@@ -128,8 +64,9 @@ class Following:
 
     def bounding_boxes_callback(self, boundbox_msg):
         print('doing angular callback')
+        self.april_center.publish(drawDetections)
         # depth_msg = rospy.wait_for_message('/camera/depth_registered/image', Image)
-
+        
         detected = False
         # if we are tracking person, we want the person with the biggest frame area
         if 'person' in self.object_names:
