@@ -531,7 +531,7 @@ geometry_msgs::PoseWithCovarianceStamped TagDetector::makeTagPose(
   return pose;
 }
 
-void TagDetector::drawDetections (cv_bridge::CvImagePtr image)
+int *TagDetector::drawDetections (cv_bridge::CvImagePtr image)
 {
   for (int i = 0; i < zarray_size(detections_); i++)
   {
@@ -592,6 +592,7 @@ void TagDetector::drawDetections (cv_bridge::CvImagePtr image)
                           (int)(det->c[1]+textsize.height/2)),
                 fontface, fontscale, cv::Scalar(0xff, 0x99, 0), 2);
   }
+  return 0;
 }
 
 // Parse standalone tag descriptions
